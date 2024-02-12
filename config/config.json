@@ -1,0 +1,9 @@
+{
+  "development": {
+    "username": "root",
+    "password": "123",
+    "database": "test-mig",
+    "host": "localhost",
+    "dialect": "mysql"
+  }
+}
