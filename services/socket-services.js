@@ -44,13 +44,14 @@ class SocketServer {
 
   async handleDisconnectEvent(io, socket, users) {
     try {
-      const user = users.find((user) => user.socket_id === socket.id);
-      console.log(user);
-      console.log("users :::::", users);
-      // await Participant.destroy({ where : { user_id : user.user_id, conversation_id : user.conversation_id } });
-      // socket.leave(user.conversation_id);
-      users = users.filter((user) => user.socket_id !== socket.id);
-      // console.log(users);
+      // get active user from users array
+      const currentUserIndex = users.findIndex((user) => user.id === socket.id);
+      
+      // remove user from users array
+      if (currentUserIndex !== -1) {
+        users.splice(currentUserIndex, 1);
+        console.log("User disconnected. Remaining users:", users);
+      }
     } catch (error) {
       console.log(error);
       io.to(socket.id).emit(this.constants.SOCKET.EVENTS.ERROR, {
@@ -106,33 +107,33 @@ class SocketServer {
       });
     }
   }
-  // handle get conversation list
-  async handleGetSingleConversation(io, socket, users) {
-    try {
-      const user = users.find((user) => user.socket_id === socket.id);
-      const chatList = await Chat.findAll({
-        where: {
-          conversation_id: user.conversation_id
-        },
-        include: {
-          model: User,
-          as: this.constants.DATABASE.CONNECTION_REF.SENDER,
-          attributes: [
-            this.constants.DATABASE.TABLE_ATTRIBUTES.COMMON.ID,
-            this.constants.DATABASE.TABLE_ATTRIBUTES.USER.FIRST_NAME,
-            this.constants.DATABASE.TABLE_ATTRIBUTES.USER.LAST_NAME
-          ],
-        },
-      })
-      io.to(socket.id).emit(this.constants.SOCKET.EVENTS.CONVERSATION_LIST, { chats: chatList });
-    } catch (error) {
-      console.log(error);
-      io.to(socket.id).emit(this.constants.SOCKET.EVENTS.ERROR, {
-        message: this.messages.allMessages.CONVERSATION_LIST_ERROR,
-        type: this.constants.SOCKET.ERROR_TYPE.CONVERSATION_LIST_ERROR
-      });
-    }
-  }
+  // // handle get conversation list
+  // async handleGetSingleConversation(io, socket, users) {
+  //   try {
+  //     const user = users.find((user) => user.socket_id === socket.id);
+  //     const chatList = await Chat.findAll({
+  //       where: {
+  //         conversation_id: user.conversation_id
+  //       },
+  //       include: {
+  //         model: User,
+  //         as: this.constants.DATABASE.CONNECTION_REF.SENDER,
+  //         attributes: [
+  //           this.constants.DATABASE.TABLE_ATTRIBUTES.COMMON.ID,
+  //           this.constants.DATABASE.TABLE_ATTRIBUTES.USER.FIRST_NAME,
+  //           this.constants.DATABASE.TABLE_ATTRIBUTES.USER.LAST_NAME
+  //         ],
+  //       },
+  //     })
+  //     io.to(socket.id).emit(this.constants.SOCKET.EVENTS.CONVERSATION_LIST, { chats: chatList });
+  //   } catch (error) {
+  //     console.log(error);
+  //     io.to(socket.id).emit(this.constants.SOCKET.EVENTS.ERROR, {
+  //       message: this.messages.allMessages.CONVERSATION_LIST_ERROR,
+  //       type: this.constants.SOCKET.ERROR_TYPE.CONVERSATION_LIST_ERROR
+  //     });
+  //   }
+  // }
 
 }
 

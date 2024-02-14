@@ -26,7 +26,7 @@ class Socket {
         try {
 
           // push the user details into users array
-          this.users.push({ socket_id: socket.id, user_name, user_id: Number(user_id) });
+          this.users.push({ id: socket.id, user_name, user_id: Number(user_id) });
           // console.log(this.users);
           // listen to message event
           socket.on(this.constants.SOCKET.EVENTS.MESSAGE, (message) => this.services.handleMessageEvent(this.io, socket, message.content, this.users));
@@ -34,7 +34,7 @@ class Socket {
           socket.on(this.constants.SOCKET.EVENTS.CONVERSATION_LIST, () => this.services.handleGetConversationList(this.io, socket, this.users));
           // listen to disconnection event
           socket.on(this.constants.SOCKET.EVENTS.DISCONNECT, () => this.services.handleDisconnectEvent(this.io, socket, this.users));
-          // console.log(this.users);
+          console.log("OUTSIDE ::: ", this.users);
         } catch (error) {
           console.log(error);
         }
