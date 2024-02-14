@@ -34,6 +34,7 @@ class ChatController {
       // create new participant
       await Participant.create(participantObj);
       res.send({
+        status : true,
         message: this.messages.allMessages.CHAT_CREATED_SUCCESSFULLY,
         conversation,
       });

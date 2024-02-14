@@ -28,8 +28,8 @@ module.exports = {
         TABLE_ATTRIBUTES: {
             COMMON: {
                 ID: "id",
-                CREATED_AT: "created_at",
-                UPDATED_AT: "updated_at",
+                CREATED_AT: "createdAt",
+                UPDATED_AT: "updatedAt",
             },
             USER: {
                 FIRST_NAME: "first_name",
@@ -63,7 +63,16 @@ module.exports = {
             SENDER: "sender",
             USERS: "users",
             PARTICIPANTS: "participants",
-            DEPARTMENT : "department"
+            DEPARTMENT : "department",
+            USER : "user",
+            PARTICIPANT_CHAT : "participant_chat",
+            CHAT_BY_CONVERSATION_ID : "chat_by_conversation_id"
+        },
+        COMMON_QUERY : {
+            ORDER : {
+                ASC: "ASC",
+                DESC: "DESC"
+            }
         }
     }
 }

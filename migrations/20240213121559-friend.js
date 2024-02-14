@@ -1,36 +1,33 @@
-// in migrations/XXXXXXXXXXXXXX-create-users-table.js 
+// in migrations/XXXXXXXXXXXXXX-create-departments-table.js
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Users', {
+    return queryInterface.createTable('Friends', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      first_name: {
-        type: Sequelize.STRING
-      },
-      last_name: {
-        type: Sequelize.STRING 
-      },
-      email : {
-        type: Sequelize.STRING 
-      },
-      password: {
-        type: Sequelize.STRING
-      },
-      department_id: {
+      from_user_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'Departments',
+          model: 'Users',
           key: 'id'
         }
       },
-      user_code : {
-        type: Sequelize.STRING
+      to_user_id: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          key: 'id'
+        }
+      },
+      status: {
+        type: Sequelize.ENUM('pending', 'accepted', 'rejected'),
+        defaultValue: 'pending'
       },
       createdAt: {
         allowNull: false,
@@ -44,6 +41,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Users');
+    return queryInterface.dropTable('Friends');
   }
 };

@@ -6,12 +6,20 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // Participant belongs to Conversation
       this.belongsTo(models.Conversation, { 
-        foreignKey: 'conversation_id'
+        foreignKey: 'conversation_id',
+        as: 'conversations'
+      });
+
+      // Participant belongs to Chat
+      this.belongsTo(models.Chat, { 
+        foreignKey: 'conversation_id',
+        as: 'participant_chat'
       });
 
       // Participant belongs to User
       this.belongsTo(models.User, {
-        foreignKey: 'user_id' 
+        foreignKey: 'user_id',
+        as: 'user'
       });
       
     }

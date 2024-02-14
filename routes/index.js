@@ -7,6 +7,7 @@ class IndexRouter {
     this.deptRouter = require("./department");
     this.userRouter = require("./user");
     this.chatRouter = require("./chat")
+    this.friendsRouter = require("./friends")
     this.setPublicRoutes();
     this.setPrivateRoutes();
   }
@@ -20,6 +21,7 @@ class IndexRouter {
     this.privateRouter.use("/", this.deptRouter);
     this.privateRouter.use("/", this.userRouter);
     this.privateRouter.use("/", this.chatRouter);
+    this.privateRouter.use("/", this.friendsRouter);
   }
 }
 

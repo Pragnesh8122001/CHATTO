@@ -7,13 +7,20 @@ module.exports = (sequelize, DataTypes) => {
 
       // Chat belongs to Conversation
       this.belongsTo(models.Conversation, { 
-        foreignKey: 'conversation_id'
+        foreignKey: 'conversation_id',
+        as: 'chats'
       });
 
       // Chat belongs to User
       this.belongsTo(models.User, {
         foreignKey: 'sender_id',
         as: 'sender'
+      });
+
+      // Chat Has many to Participant
+      this.hasMany(models.Participant, {
+        foreignKey: 'conversation_id',
+        as: 'participant_chat'
       });
     }
   }

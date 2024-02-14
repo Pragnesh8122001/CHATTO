@@ -107,8 +107,18 @@ class UserController {
       try {
         const { first_name, last_name, email, password, department_name } =
           req.body;
+        // Generate user code
+        const userCode = await this.helpers.generateUserCode();
+        
         // get existing user
-        const existingUser = await User.findOne({ where: { email } });
+        let existingUser = await User.findOne({
+          where: {
+            [this.Op.or]: [
+              { email: email },
+              { user_code: userCode },
+            ],
+          },
+        });        
         // check if user already exist
         if (existingUser) {
           return res.send({
@@ -132,6 +142,7 @@ class UserController {
           email,
           department_id: department.id,
           password,
+          user_code : userCode
         };
         // insert user
         await User.create(userObject);

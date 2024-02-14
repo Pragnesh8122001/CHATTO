@@ -5,9 +5,13 @@ class App {
         this.indexRouter = require("./routes/index");
         this.middleware = require("./middleware/index")
         this.socketServer = require("./socket")
+        this.cors = require("cors");
         require("dotenv").config();
 
         this.app.use(this.express.json());
+
+        // add cors
+        this.app.use(this.cors({ origin : "*" }));
 
         // public routes without authentication
         this.app.use("/api", this.indexRouter.publicRouter);

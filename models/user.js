@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
 
       // New associations for chats
       this.hasMany(models.Chat, { foreignKey: 'sender_id', as: 'chats' })
+
+      this.hasMany(models.Friend, { foreignKey: 'to_user_id', as: 'req_from' })
+
+      this.hasMany(models.Friend, { foreignKey: 'from_user_id', as: 'req_to' })
     }
   }
   User.init({
@@ -23,7 +27,8 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     department_id: DataTypes.INTEGER,
     createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE
+    updatedAt: DataTypes.DATE,
+    user_code : DataTypes.STRING
   }, {
     sequelize,
     modelName: 'User',
