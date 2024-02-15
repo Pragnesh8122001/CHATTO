@@ -20,6 +20,7 @@ class AuthController {
       try {
         // if entered email exists
         let user = await User.findOne({ where: { email, password } });
+
         // if enter password is wrong
         if (!user) {
           return res.status(401).send({ message: this.messages.allMessages.LOG_IN_UNAUTHORIZED });
@@ -35,17 +36,18 @@ class AuthController {
           process.env.ACCESS_TOKEN_SECRET,
           { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION_TIME }
         );
+
         // Login Successfully
         return res.status(200).send({
           status: true,
           message: this.messages.allMessages.LOG_IN_SUCCESS,
           data: {
-            // user details
             user: {
               id: user.id,
               first_name: user.first_name,
               last_name: user.last_name,
               email: user.email,
+              user_code: user.user_code,
             },
           },
           // JWT access token

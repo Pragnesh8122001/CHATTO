@@ -64,7 +64,7 @@ class SocketServer {
   // handle get conversation list
   async handleGetConversationList(io, socket, users) {
     try {
-      const user = users.find((user) => user.socket_id === socket.id);
+      // const user = users.find((user) => user.socket_id === socket.id);
       const conversations = await Conversation.findAll({
         include: [
           //   {
@@ -107,6 +107,7 @@ class SocketServer {
       });
     }
   }
+  
   // // handle get conversation list
   // async handleGetSingleConversation(io, socket, users) {
   //   try {

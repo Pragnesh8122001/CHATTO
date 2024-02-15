@@ -5,6 +5,7 @@ class Socket {
     this.jwt = require("jsonwebtoken");
     this.services = require("./services/socket-services")
     this.validation = require("./validations/socket.validation")
+    this.messages = require("./messages/socket.messages")
     this.server = require("socket.io")(this.http, {
       cors: {
         origin: "*",
@@ -15,6 +16,10 @@ class Socket {
     this.users = [];
     this.io = this.server.on(this.constants.SOCKET.EVENTS.CONNECTION, async (socket) => {
       const { token } = socket.handshake.query;
+      if (!token) {
+        io.to(socket.id).emit(this.constants.SOCKET.EVENTS.ERROR, { message: this.messages.allMessages.TOKEN_NOT_FOUND, type: this.constants.SOCKET.ERROR_TYPE.TOKEN_NOT_FOUND })
+        return
+      }
       const tokenDecoded = this.jwt.decode(token);
       const { user_name, user_id } = tokenDecoded;
       // validate handshake query
@@ -24,17 +29,17 @@ class Socket {
         console.log(hand_shake_validation.error.details[0].message);
       } else {
         try {
-
           // push the user details into users array
           this.users.push({ id: socket.id, user_name, user_id: Number(user_id) });
-          // console.log(this.users);
+
           // listen to message event
           socket.on(this.constants.SOCKET.EVENTS.MESSAGE, (message) => this.services.handleMessageEvent(this.io, socket, message.content, this.users));
+
           // listen to get conversation list event
           socket.on(this.constants.SOCKET.EVENTS.CONVERSATION_LIST, () => this.services.handleGetConversationList(this.io, socket, this.users));
+
           // listen to disconnection event
           socket.on(this.constants.SOCKET.EVENTS.DISCONNECT, () => this.services.handleDisconnectEvent(this.io, socket, this.users));
-          console.log("OUTSIDE ::: ", this.users);
         } catch (error) {
           console.log(error);
         }

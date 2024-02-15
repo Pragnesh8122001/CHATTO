@@ -5,6 +5,7 @@ class FriendsController {
   constructor() {
     this.messages = require("../messages/friends.messages");
     this.validation = require("../validations/friends.validation");
+    this.constants = require("../helpers/constants");
     this.helpers = require("../helpers/helper");
   }
 
@@ -41,7 +42,7 @@ class FriendsController {
         // if user already sent friend request
         if (existingFriendReq) {
 
-          if (existingFriendReq.status === "accepted") {
+          if (existingFriendReq.status === this.constants.DATABASE.ENUMS.STATUS.ACCEPTED ) {
             return res.status(400).send({
               status: false,
               message: this.messages.allMessages.ALREADY_FRIENDS,
@@ -57,9 +58,9 @@ class FriendsController {
           }
 
           // if user already sent friend request and was rejected by receiver then send request again
-          if (existingFriendReq.status === "rejected") {
+          if (existingFriendReq.status === this.constants.DATABASE.ENUMS.STATUS.REJECTED) {
             existingFriendReq.req_occurrence_count++;
-            existingFriendReq.status = "pending";
+            existingFriendReq.status = this.constants.DATABASE.ENUMS.STATUS.PENDING;
             await existingFriendReq.save();
             return res.status(200).send({
               status: true,
@@ -74,7 +75,7 @@ class FriendsController {
           });
         }
 
-        await Friend.create({ from_user_id: req.currentUser.user_id, to_user_id: receiver.id, status: "pending" });
+        await Friend.create({ from_user_id: req.currentUser.user_id, to_user_id: receiver.id, status: this.constants.DATABASE.ENUMS.STATUS.PENDING });
         res.status(200).send({
           status: true,
           message: this.messages.allMessages.FRIEND_REQUEST_SENT,
@@ -92,19 +93,27 @@ class FriendsController {
   // Get friend request list (GET)
   getFriendRequestList = async (req, res) => {
     try {
+
+      // Get friend request list
       const friends = await Friend.findAll({
         where: {
           to_user_id: req.currentUser.user_id,
-          status: "pending",
+          status: this.constants.DATABASE.ENUMS.STATUS.PENDING,
         },
         include: [
           {
             model: User,
-            attributes: ["id", "first_name", "last_name", "user_code"],
-            as: "req_from"
+            attributes: [
+              this.constants.DATABASE.TABLE_ATTRIBUTES.COMMON.ID,
+              this.constants.DATABASE.TABLE_ATTRIBUTES.USER.FIRST_NAME,
+              this.constants.DATABASE.TABLE_ATTRIBUTES.USER.LAST_NAME,
+              this.constants.DATABASE.TABLE_ATTRIBUTES.USER.USER_CODE,
+              ],
+            as: this.constants.DATABASE.CONNECTION_REF.REQ_FROM
           },
         ],
       });
+
       res.status(200).send({
         status: true,
         message: this.messages.allMessages.GET_FRIEND_REQUEST,
@@ -122,12 +131,15 @@ class FriendsController {
   // Get friend request count (GET)
   getFriendRequestCount = async (req, res) => {
     try {
+
+      // Get friend request count
       const count = await Friend.count({
         where: {
           to_user_id: req.currentUser.user_id,
-          status: "pending",
+          status: this.constants.DATABASE.ENUMS.STATUS.PENDING,
         },
       });
+
       res.status(200).send({
         status: true,
         message: this.messages.allMessages.GET_FRIEND_REQUEST_COUNT,
@@ -166,15 +178,20 @@ class FriendsController {
           });
         }
 
-        if (existingRequest.status === "accepted") {
+        // if request already accepted then response with already friend
+        if (existingRequest.status === this.constants.DATABASE.ENUMS.STATUS.ACCEPTED) {
           return res.status(400).send({
             status: false,
             message: this.messages.allMessages.ALREADY_FRIENDS,
           });
         }
 
+        // if request already rejected
         await Friend.update({ status }, { where: { id: reqId } });
-        const message = status === "accepted" ? this.messages.allMessages.ACCEPTED_FRIEND_REQUEST : this.messages.allMessages.REJECTED_FRIEND_REQUEST;
+
+        // message according to status
+        const message = status === this.constants.DATABASE.ENUMS.STATUS.ACCEPTED ? this.messages.allMessages.ACCEPTED_FRIEND_REQUEST : this.messages.allMessages.REJECTED_FRIEND_REQUEST;
+        
         res.status(200).send({
           status: true,
           message: message,

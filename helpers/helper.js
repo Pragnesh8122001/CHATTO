@@ -14,6 +14,5 @@ exports.generateUserCode = async () => {
   for (let i = 0; i < length; i++) {
     userCode += charset[buffer[i] % charset.length]; 
   }
-  console.log(userCode);
   return userCode;
 };

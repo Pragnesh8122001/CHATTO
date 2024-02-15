@@ -14,7 +14,8 @@ module.exports = {
             SEND_MESSAGE_ERROR: "message-error",
             READ_SESSION_ERROR: "read-session-error",
             DISCONNECTION_ERROR: "disconnect-error",
-            CONVERSATION_LIST_ERROR: "get-conversation-list-error"
+            CONVERSATION_LIST_ERROR: "get-conversation-list-error",
+            TOKEN_NOT_FOUND : "token-not-found"
         },
     },
     DATABASE: {
@@ -37,6 +38,7 @@ module.exports = {
                 EMAIL: "email",
                 DEPARTMENT_ID: "department_id",
                 PASSWORD: "password",
+                USER_CODE : "user_code"
             },
             DEPARTMENT: {
                 DEPARTMENT_NAME: "department_name",
@@ -54,6 +56,12 @@ module.exports = {
             PARTICIPANT: {
                 USER_ID: "user_id",
                 CONVERSATION_ID: "conversation_id"
+            },
+            FRIENDS: {
+                FROM_USER_ID: "from_user_id",
+                TO_USER_ID: "to_user_id",
+                STATUS: "status",
+                REQ_OCCURRENCE_COUNT: "req_occurrence_count"
             }
         },
         CONNECTION_REF: {
@@ -66,12 +74,20 @@ module.exports = {
             DEPARTMENT : "department",
             USER : "user",
             PARTICIPANT_CHAT : "participant_chat",
-            CHAT_BY_CONVERSATION_ID : "chat_by_conversation_id"
+            CHAT_BY_CONVERSATION_ID : "chat_by_conversation_id",
+            REQ_FROM : "req_from",
         },
         COMMON_QUERY : {
             ORDER : {
                 ASC: "ASC",
                 DESC: "DESC"
+            }
+        },
+        ENUMS : {
+            STATUS : {
+                ACCEPTED : "accepted",
+                PENDING : "pending",
+                REJECTED : "rejected"
             }
         }
     }
