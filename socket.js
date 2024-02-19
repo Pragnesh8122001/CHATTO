@@ -31,12 +31,17 @@ class Socket {
         try {
           // push the user details into users array
           this.users.push({ id: socket.id, user_name, user_id: Number(user_id) });
+          await this.services.handleGetConversationList(this.io, socket, this.users);
+          console.log("USER JOINED ::: ", this.users);
 
           // listen to message event
-          socket.on(this.constants.SOCKET.EVENTS.MESSAGE, (message) => this.services.handleMessageEvent(this.io, socket, message.content, this.users));
+          socket.on(this.constants.SOCKET.EVENTS.MESSAGE, (messageObj) => this.services.handleMessageEvent(this.io, socket, messageObj, this.users));
 
           // listen to get conversation list event
           socket.on(this.constants.SOCKET.EVENTS.CONVERSATION_LIST, () => this.services.handleGetConversationList(this.io, socket, this.users));
+
+          // listen to message event
+          socket.on(this.constants.SOCKET.EVENTS.START_CONVERSATION, (conversationObj) => this.services.handleStartConversation(this.io, socket, conversationObj, this.users));
 
           // listen to disconnection event
           socket.on(this.constants.SOCKET.EVENTS.DISCONNECT, () => this.services.handleDisconnectEvent(this.io, socket, this.users));

@@ -26,7 +26,7 @@ class FriendsController {
 
         // if receiver user not exist
         if (!receiver) {
-          return res.status(400).send({
+          return res.status(422).send({
             status: false,
             message: this.messages.allMessages.RECEIVER_NOT_FOUND,
           });
@@ -42,8 +42,8 @@ class FriendsController {
         // if user already sent friend request
         if (existingFriendReq) {
 
-          if (existingFriendReq.status === this.constants.DATABASE.ENUMS.STATUS.ACCEPTED ) {
-            return res.status(400).send({
+          if (existingFriendReq.status === this.constants.DATABASE.ENUMS.STATUS.ACCEPTED) {
+            return res.status(422).send({
               status: false,
               message: this.messages.allMessages.ALREADY_FRIENDS,
             });
@@ -51,7 +51,7 @@ class FriendsController {
 
           // Check if user has sent too many friend request
           if (existingFriendReq.req_occurrence_count >= 5) {
-            return res.status(400).send({
+            return res.status(422).send({
               status: false,
               message: this.messages.allMessages.TOO_MANY_REQUESTS_SENT,
             });
@@ -69,7 +69,7 @@ class FriendsController {
           }
 
           // if user already sent friend request
-          return res.status(400).send({
+          return res.status(422).send({
             status: false,
             message: this.messages.allMessages.FRIEND_REQUEST_ALREADY_SENT,
           });
@@ -108,7 +108,7 @@ class FriendsController {
               this.constants.DATABASE.TABLE_ATTRIBUTES.USER.FIRST_NAME,
               this.constants.DATABASE.TABLE_ATTRIBUTES.USER.LAST_NAME,
               this.constants.DATABASE.TABLE_ATTRIBUTES.USER.USER_CODE,
-              ],
+            ],
             as: this.constants.DATABASE.CONNECTION_REF.REQ_FROM
           },
         ],
@@ -172,7 +172,7 @@ class FriendsController {
 
         // if request does not exist
         if (!existingRequest) {
-          return res.status(400).send({
+          return res.status(422).send({
             status: false,
             message: this.messages.allMessages.REQUEST_NOT_EXIST,
           });
@@ -180,7 +180,7 @@ class FriendsController {
 
         // if request already accepted then response with already friend
         if (existingRequest.status === this.constants.DATABASE.ENUMS.STATUS.ACCEPTED) {
-          return res.status(400).send({
+          return res.status(422).send({
             status: false,
             message: this.messages.allMessages.ALREADY_FRIENDS,
           });
@@ -191,7 +191,7 @@ class FriendsController {
 
         // message according to status
         const message = status === this.constants.DATABASE.ENUMS.STATUS.ACCEPTED ? this.messages.allMessages.ACCEPTED_FRIEND_REQUEST : this.messages.allMessages.REJECTED_FRIEND_REQUEST;
-        
+
         res.status(200).send({
           status: true,
           message: message,

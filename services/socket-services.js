@@ -7,18 +7,18 @@ class SocketServer {
   }
 
   // handle conversation messages
-  async handleMessageEvent(io, socket, message, users) {
+  async handleMessageEvent(io, socket, messageObj, users) {
     try {
       // get active user from users array
       const user = users.find((user) => user.socket_id === socket.id);
       // chat object
-      const chatObj = { conversation_id: user.conversation_id, sender_id: user.user_id, content: message }
+      const chatObj = { conversation_id: messageObj.conversation_id, sender_id: user.user_id, content: message }
       // create chat
       const chat = await Chat.create(chatObj);
 
       const chatList = await Chat.findAll({
         where: {
-          conversation_id: user.conversation_id
+          conversation_id: messageObj.conversation_id
         },
         include: {
           model: User,
@@ -46,7 +46,7 @@ class SocketServer {
     try {
       // get active user from users array
       const currentUserIndex = users.findIndex((user) => user.id === socket.id);
-      
+
       // remove user from users array
       if (currentUserIndex !== -1) {
         users.splice(currentUserIndex, 1);
@@ -107,34 +107,123 @@ class SocketServer {
       });
     }
   }
-  
-  // // handle get conversation list
-  // async handleGetSingleConversation(io, socket, users) {
-  //   try {
-  //     const user = users.find((user) => user.socket_id === socket.id);
-  //     const chatList = await Chat.findAll({
-  //       where: {
-  //         conversation_id: user.conversation_id
-  //       },
-  //       include: {
-  //         model: User,
-  //         as: this.constants.DATABASE.CONNECTION_REF.SENDER,
-  //         attributes: [
-  //           this.constants.DATABASE.TABLE_ATTRIBUTES.COMMON.ID,
-  //           this.constants.DATABASE.TABLE_ATTRIBUTES.USER.FIRST_NAME,
-  //           this.constants.DATABASE.TABLE_ATTRIBUTES.USER.LAST_NAME
-  //         ],
-  //       },
-  //     })
-  //     io.to(socket.id).emit(this.constants.SOCKET.EVENTS.CONVERSATION_LIST, { chats: chatList });
-  //   } catch (error) {
-  //     console.log(error);
-  //     io.to(socket.id).emit(this.constants.SOCKET.EVENTS.ERROR, {
-  //       message: this.messages.allMessages.CONVERSATION_LIST_ERROR,
-  //       type: this.constants.SOCKET.ERROR_TYPE.CONVERSATION_LIST_ERROR
-  //     });
-  //   }
-  // }
+
+  async handleStartConversation(io, socket, conversationObj, users) {
+    try {
+      const user = users.find((user) => user.id === socket.id);
+      const isGroupChat = conversationObj.isGroupChat
+      if (!isGroupChat) {
+        // create conversation if does not exist for single user
+        await this.createTwoUserConversation(conversationObj, user);
+        return;
+      } else {
+        // create conversation if does not exist for group
+        await this.createGroupConversation(conversationObj, user);
+        return;
+      }
+    } catch (error) {
+      console.log(error);
+      io.to(socket.id).emit(this.constants.SOCKET.EVENTS.ERROR, {
+        message: this.messages.allMessages.CONVERSATION_LIST_ERROR,
+        type: this.constants.SOCKET.ERROR_TYPE.CONVERSATION_LIST_ERROR
+      });
+    }
+  }
+
+  // handle get conversation list
+  async handleGetSingleConversation(io, socket, users) {
+    try {
+      const user = users.find((user) => user.socket_id === socket.id);
+      const chatList = await Chat.findOne({
+        where: {
+          conversation_id: user.conversation_id
+        },
+        include: {
+          model: User,
+          as: this.constants.DATABASE.CONNECTION_REF.SENDER,
+          attributes: [
+            this.constants.DATABASE.TABLE_ATTRIBUTES.COMMON.ID,
+            this.constants.DATABASE.TABLE_ATTRIBUTES.USER.FIRST_NAME,
+            this.constants.DATABASE.TABLE_ATTRIBUTES.USER.LAST_NAME
+          ],
+        },
+      })
+      io.to(socket.id).emit(this.constants.SOCKET.EVENTS.CONVERSATION_LIST, { chats: chatList });
+    } catch (error) {
+      console.log(error);
+      io.to(socket.id).emit(this.constants.SOCKET.EVENTS.ERROR, {
+        message: this.messages.allMessages.CONVERSATION_LIST_ERROR,
+        type: this.constants.SOCKET.ERROR_TYPE.CONVERSATION_LIST_ERROR
+      });
+    }
+  }
+
+  async createTwoUserConversation(conversationObj, user) {
+    // find user participant 
+    const existingUserParticipant = await User.findOne({
+      where: {
+        id: conversationObj.conversationParticipantId,
+      },
+    })
+
+    // if user participant does not exist
+    if (!existingUserParticipant) {
+      return
+    }
+
+    // conversation username
+    const conversationName = user.user_name + "-" + conversationObj.conversationParticipantName;
+    const reversedConversationName = conversationObj.conversationParticipantName + "-" + user.user_name;
+
+    const existingConversation = await Conversation.findOne({
+      where: {
+        [Op.or]: [
+          { conversation_name: conversationName },
+          { conversation_name: reversedConversationName },
+        ],
+      },
+    });
+
+    // if conversation already exist
+    if (existingConversation) {
+      return
+    }
+
+    // new conversation object
+    const conversationRecordObj = {
+      conversation_name: conversationName,
+      description: "",
+      conversation_creator_id: user.user_id
+    }
+
+    // create conversation
+    const conversation = await Conversation.create(conversationRecordObj);
+
+    // create participants
+    const participantRecordsArray =
+      [
+        {
+          conversation_id: conversation.id,
+          user_id: user.user_id
+        },
+        {
+          conversation_id: conversation.id,
+          user_id: conversationObj.conversationParticipantId
+        }
+      ]
+    await Participant.bulkCreate(participantRecordsArray);
+  }
+
+  async createGroupConversation(conversationObj, user) {
+    // new conversation object
+    const conversationRecordObj = {
+      conversation_name: conversationObj.conversationName,
+      description: conversationObj.conversationDescription,
+      conversation_creator_id: user.user_id
+    }
+    await Conversation.create(conversationRecordObj);
+    // io.to(socket.id).emit(this.constants.SOCKET.EVENTS.START_CONVERSATION, { conversationId: conversation.id });
+  }
 
 }
 

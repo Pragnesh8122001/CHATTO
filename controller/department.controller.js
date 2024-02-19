@@ -13,11 +13,11 @@ class DepartmentController {
             const department = await Department.findAll({
                 attributes: [this.constants.TABLE_ATTRIBUTES.COMMON.ID, this.constants.TABLE_ATTRIBUTES.DEPARTMENT.DEPARTMENT_NAME]
             });
-            
-            res.status(200).send({ status : true, message: this.messages.allMessages.GET_DEPARTMENT_LIST, department })
+
+            res.status(200).send({ status: true, message: this.messages.allMessages.GET_DEPARTMENT_LIST, department })
         } catch (error) {
             console.log(error);
-            res.status(500).send({ status : false, message: this.messages.allMessages.GET_DEPARTMENT_LIST_FAILED });
+            res.status(500).send({ status: false, message: this.messages.allMessages.GET_DEPARTMENT_LIST_FAILED });
         }
     };
 
@@ -30,13 +30,13 @@ class DepartmentController {
 
             // if department not exist
             if (!department) {
-                return res.status(400).send({ status : false, message: this.messages.allMessages.DEPARTMENT_NOT_EXIST });
+                return res.status(422).send({ status: false, message: this.messages.allMessages.DEPARTMENT_NOT_EXIST });
             }
 
-            res.status(200).send({ status : true, message: this.messages.allMessages.GET_DEPARTMENT, department });
+            res.status(200).send({ status: true, message: this.messages.allMessages.GET_DEPARTMENT, department });
         } catch (error) {
             console.log(error);
-            res.status(500).send({ status : false, message: this.messages.allMessages.GET_DEPARTMENT_FAILED });
+            res.status(500).send({ status: false, message: this.messages.allMessages.GET_DEPARTMENT_FAILED });
         }
     }
 
@@ -50,21 +50,21 @@ class DepartmentController {
         } else {
             try {
                 const { department_name } = req.body;
-                
+
                 // check if department name already exist
                 const existingDepartmentName = await Department.findOne({ where: { department_name } });
 
                 if (existingDepartmentName) {
-                    return res.send({ status : false, message: this.messages.allMessages.DEPARTMENT_ALREADY_EXIST });
+                    return res.send({ status: false, message: this.messages.allMessages.DEPARTMENT_ALREADY_EXIST });
                 }
 
                 // insert department
                 await Department.create({ department_name });
 
-                res.status(200).send({ status : true, message: this.messages.allMessages.DEPARTMENT_INSERTED });
+                res.status(200).send({ status: true, message: this.messages.allMessages.DEPARTMENT_INSERTED });
             } catch (error) {
                 console.log(error);
-                res.status(500).send({ status : false, message: this.messages.allMessages.DEPARTMENT_INSERT_FAILED });
+                res.status(500).send({ status: false, message: this.messages.allMessages.DEPARTMENT_INSERT_FAILED });
             }
         }
     }
@@ -94,15 +94,15 @@ class DepartmentController {
 
                 // if department name already exist with different id
                 if (existingDepartmentName) {
-                    return res.status(400).send({ status : false, message: this.messages.allMessages.DEPARTMENT_ALREADY_EXIST });
+                    return res.status(422).send({ status: false, message: this.messages.allMessages.DEPARTMENT_ALREADY_EXIST });
                 }
 
                 // update department
                 await Department.update({ department_name }, { where: { id } });
-                res.send({ status : true, message: this.messages.allMessages.DEPARTMENT_UPDATED });
+                res.send({ status: true, message: this.messages.allMessages.DEPARTMENT_UPDATED });
             } catch (error) {
                 console.log(error);
-                res.status(500).send({ status : false, message: this.messages.allMessages.DEPARTMENT_UPDATE_FAILED });
+                res.status(500).send({ status: false, message: this.messages.allMessages.DEPARTMENT_UPDATE_FAILED });
             }
         }
     }
@@ -116,16 +116,16 @@ class DepartmentController {
 
             // if department has users
             if (usersWithDepartment) {
-                return res.status(400).send({ status : false, message: this.messages.allMessages.DEPARTMENT_HAS_USERS });
+                return res.status(422).send({ status: false, message: this.messages.allMessages.DEPARTMENT_HAS_USERS });
             }
 
             // delete department
             await Department.destroy({ where: { id } });
-            
-            res.status(200).send({ status : true, message: this.messages.allMessages.DEPARTMENT_DELETED });
+
+            res.status(200).send({ status: true, message: this.messages.allMessages.DEPARTMENT_DELETED });
         } catch (error) {
             console.log(error);
-            res.status(500).send({ status : false, message: this.messages.allMessages.DEPARTMENT_DELETE_FAILED });
+            res.status(500).send({ status: false, message: this.messages.allMessages.DEPARTMENT_DELETE_FAILED });
         }
     }
 }

@@ -5,6 +5,7 @@ module.exports = {
             DISCONNECT: "disconnect",
             MESSAGE: "message",
             CONVERSATION_LIST: "conversation-list",
+            START_CONVERSATION : "start-conversation",
             ERROR: "error"
         },
         ERROR_TYPE: {
@@ -15,16 +16,16 @@ module.exports = {
             READ_SESSION_ERROR: "read-session-error",
             DISCONNECTION_ERROR: "disconnect-error",
             CONVERSATION_LIST_ERROR: "get-conversation-list-error",
-            TOKEN_NOT_FOUND : "token-not-found"
+            TOKEN_NOT_FOUND: "token-not-found"
         },
     },
     DATABASE: {
-        TABLES_NAMES : {
-            USER : "User",
-            DEPARTMENT : "Department",
-            CHAT : "Chat",
-            CONVERSATION : "Conversation",
-            PARTICIPANT : "Participant"
+        TABLES_NAMES: {
+            USER: "User",
+            DEPARTMENT: "Department",
+            CHAT: "Chat",
+            CONVERSATION: "Conversation",
+            PARTICIPANT: "Participant"
         },
         TABLE_ATTRIBUTES: {
             COMMON: {
@@ -38,7 +39,7 @@ module.exports = {
                 EMAIL: "email",
                 DEPARTMENT_ID: "department_id",
                 PASSWORD: "password",
-                USER_CODE : "user_code"
+                USER_CODE: "user_code"
             },
             DEPARTMENT: {
                 DEPARTMENT_NAME: "department_name",
@@ -71,23 +72,23 @@ module.exports = {
             SENDER: "sender",
             USERS: "users",
             PARTICIPANTS: "participants",
-            DEPARTMENT : "department",
-            USER : "user",
-            PARTICIPANT_CHAT : "participant_chat",
-            CHAT_BY_CONVERSATION_ID : "chat_by_conversation_id",
-            REQ_FROM : "req_from",
+            DEPARTMENT: "department",
+            USER: "user",
+            PARTICIPANT_CHAT: "participant_chat",
+            CHAT_BY_CONVERSATION_ID: "chat_by_conversation_id",
+            REQ_FROM: "req_from",
         },
-        COMMON_QUERY : {
-            ORDER : {
+        COMMON_QUERY: {
+            ORDER: {
                 ASC: "ASC",
                 DESC: "DESC"
             }
         },
-        ENUMS : {
-            STATUS : {
-                ACCEPTED : "accepted",
-                PENDING : "pending",
-                REJECTED : "rejected"
+        ENUMS: {
+            STATUS: {
+                ACCEPTED: "accepted",
+                PENDING: "pending",
+                REJECTED: "rejected"
             }
         }
     }
