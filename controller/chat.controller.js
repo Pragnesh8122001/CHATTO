@@ -1,9 +1,8 @@
-/** @format */
-
-const { Conversation, Participant } = require("../models");
+const { Conversation, Participant, Chat, User } = require("../models");
 class ChatController {
   constructor() {
     this.messages = require("../messages/chat.messages");
+    this.constants = require("../helpers/constants");
   }
   getChatRequest = async (req, res) => {
     try {
@@ -34,7 +33,7 @@ class ChatController {
       // create new participant
       await Participant.create(participantObj);
       res.send({
-        status : true,
+        status: true,
         message: this.messages.allMessages.CHAT_CREATED_SUCCESSFULLY,
         conversation,
       });
@@ -42,6 +41,39 @@ class ChatController {
       console.log(error);
     }
   };
+
+  getSingleConversationChats = async (req, res) => {
+    try {
+      const { conversationId } = req.query;
+      // const user = users.find((user) => user.socket_id === socket.id);
+      const chatList = await Chat.findAll({
+        where: {
+          conversation_id: conversationId
+        },
+        attributes: [this.constants.DATABASE.TABLE_ATTRIBUTES.CHAT.CONTENT, this.constants.DATABASE.TABLE_ATTRIBUTES.COMMON.CREATED_AT],
+        include: {
+          model: User,
+          as: this.constants.DATABASE.CONNECTION_REF.SENDER,
+          attributes: [
+            this.constants.DATABASE.TABLE_ATTRIBUTES.COMMON.ID,
+            this.constants.DATABASE.TABLE_ATTRIBUTES.USER.FIRST_NAME,
+            this.constants.DATABASE.TABLE_ATTRIBUTES.USER.LAST_NAME
+          ],
+        },
+        order: [[this.constants.DATABASE.TABLE_ATTRIBUTES.COMMON.CREATED_AT, this.constants.DATABASE.COMMON_QUERY.ORDER.DESC]],
+      })
+      res.status(200).send({
+        status: true,
+        message: this.messages.allMessages.CHAT_LIST_SUCCESSFULLY,
+        chatList
+      })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+        message: this.messages.allMessages.CONVERSATION_LIST_ERROR,
+      });
+    }
+  }
 }
 
 module.exports = new ChatController();

@@ -6,6 +6,7 @@ module.exports = {
             MESSAGE: "message",
             CONVERSATION_LIST: "conversation-list",
             START_CONVERSATION : "start-conversation",
+            GET_SINGLE_CONVERSATION_CHAT : "get-single-conversation-chat",
             ERROR: "error"
         },
         ERROR_TYPE: {

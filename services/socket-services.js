@@ -10,15 +10,17 @@ class SocketServer {
   async handleMessageEvent(io, socket, messageObj, users) {
     try {
       // get active user from users array
-      const user = users.find((user) => user.socket_id === socket.id);
+      const user = users.find((user) => user.id === socket.id);
+      
       // chat object
-      const chatObj = { conversation_id: messageObj.conversation_id, sender_id: user.user_id, content: message }
+      const chatObj = { conversation_id: messageObj.conversationId, sender_id: user.user_id, content: messageObj.message }
+
       // create chat
-      const chat = await Chat.create(chatObj);
+      await Chat.create(chatObj);
 
       const chatList = await Chat.findAll({
         where: {
-          conversation_id: messageObj.conversation_id
+          conversation_id: messageObj.conversationId
         },
         include: {
           model: User,
@@ -62,17 +64,10 @@ class SocketServer {
   }
 
   // handle get conversation list
-  async handleGetConversationList(io, socket, users) {
+  async handleGetConversationList(io, socket) {
     try {
-      // const user = users.find((user) => user.socket_id === socket.id);
       const conversations = await Conversation.findAll({
         include: [
-          //   {
-          //   model: Participant,
-          //   where: { user_id: user.user_id },
-          //   attributes: [],
-          //   as: this.constants.DATABASE.CONNECTION_REF.CONVERSATIONS
-          // },
           {
             model: Chat,
             required: false,
@@ -108,7 +103,7 @@ class SocketServer {
     }
   }
 
-  async handleStartConversation(io, socket, conversationObj, users) {
+  async handleStartConversation(io, socket, users, conversationObj) {
     try {
       const user = users.find((user) => user.id === socket.id);
       const isGroupChat = conversationObj.isGroupChat
@@ -130,14 +125,15 @@ class SocketServer {
     }
   }
 
-  // handle get conversation list
-  async handleGetSingleConversation(io, socket, users) {
+  // handle get single conversation chat list
+  async handleGetChatList(io, socket, conversation) {
     try {
-      const user = users.find((user) => user.socket_id === socket.id);
-      const chatList = await Chat.findOne({
+      // const user = users.find((user) => user.socket_id === socket.id);
+      const chatList = await Chat.findAll({
         where: {
-          conversation_id: user.conversation_id
+          conversation_id: conversation.conversationId
         },
+        attributes: [this.constants.DATABASE.TABLE_ATTRIBUTES.CHAT.CONTENT, this.constants.DATABASE.TABLE_ATTRIBUTES.COMMON.CREATED_AT],
         include: {
           model: User,
           as: this.constants.DATABASE.CONNECTION_REF.SENDER,
@@ -147,8 +143,9 @@ class SocketServer {
             this.constants.DATABASE.TABLE_ATTRIBUTES.USER.LAST_NAME
           ],
         },
+        order: [[this.constants.DATABASE.TABLE_ATTRIBUTES.COMMON.CREATED_AT, this.constants.DATABASE.COMMON_QUERY.ORDER.DESC]],
       })
-      io.to(socket.id).emit(this.constants.SOCKET.EVENTS.CONVERSATION_LIST, { chats: chatList });
+      io.to(socket.id).emit(this.constants.SOCKET.EVENTS.GET_SINGLE_CONVERSATION_CHAT, { chats: chatList });
     } catch (error) {
       console.log(error);
       io.to(socket.id).emit(this.constants.SOCKET.EVENTS.ERROR, {
@@ -222,7 +219,6 @@ class SocketServer {
       conversation_creator_id: user.user_id
     }
     await Conversation.create(conversationRecordObj);
-    // io.to(socket.id).emit(this.constants.SOCKET.EVENTS.START_CONVERSATION, { conversationId: conversation.id });
   }
 
 }

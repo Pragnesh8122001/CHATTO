@@ -104,7 +104,7 @@ class FriendsController {
           {
             model: User,
             attributes: [
-              this.constants.DATABASE.TABLE_ATTRIBUTES.COMMON.ID,
+              // this.constants.DATABASE.TABLE_ATTRIBUTES.COMMON.ID,
               this.constants.DATABASE.TABLE_ATTRIBUTES.USER.FIRST_NAME,
               this.constants.DATABASE.TABLE_ATTRIBUTES.USER.LAST_NAME,
               this.constants.DATABASE.TABLE_ATTRIBUTES.USER.USER_CODE,

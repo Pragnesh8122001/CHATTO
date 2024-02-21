@@ -10,7 +10,7 @@ class App {
 
         this.app.use(this.express.json());
 
-        // add cors
+        // cors
         this.app.use(this.cors({ origin : "*" }));
 
         // public routes without authentication

@@ -7,6 +7,7 @@ class UserRouter {
   
     setRoutes() {
       this.router.get("/chat", this.chatController.getChatRequest);
+      this.router.get("/chat/list", this.chatController.getSingleConversationChats);
     }
   }
   
